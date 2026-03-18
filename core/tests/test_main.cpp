@@ -20,14 +20,10 @@ TEST(TypesTest, Constants) {
     EXPECT_DOUBLE_EQ(synthcore::A4_FREQUENCY, 440.0);
 }
 
-TEST(TypesTest, MidiNoteStructure) {
-    synthcore::MidiNote note;
-    note.note = 69;
-    note.velocity = 100;
-    note.channel = 0;
-    EXPECT_EQ(note.note, 69);
-    EXPECT_EQ(note.velocity, 100);
-    EXPECT_EQ(note.channel, 0);
+TEST(TypesTest, MidiNoteType) {
+    synthcore::MidiNote note = 69;
+    EXPECT_EQ(note, 69);
+    EXPECT_EQ(sizeof(synthcore::MidiNote), 1);
 }
 
 TEST(VoiceTest, BasicInstantiation) {
