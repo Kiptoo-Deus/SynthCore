@@ -26,7 +26,7 @@ FMOperator::FMOperator()
 
 void FMOperator::setEnvelope(float attack, float decay, float sustain, float release) noexcept {
     attackRate_ = attack > 0.0f ? 1.0f / (attack * static_cast<float>(sampleRate_)) : 1.0f;
-    decayRate_ = decay > 0.0f ? 1.0f / (decay * static_cast<float>(sampleRate_)) : 1.0f;
+    decayRate_ = decay > 0.0f ? (1.0f - std::clamp(sustain, 0.0f, 1.0f)) / (decay * static_cast<float>(sampleRate_)) : 1.0f;
     sustainLevel_ = std::clamp(sustain, 0.0f, 1.0f);
     releaseRate_ = release > 0.0f ? 1.0f / (release * static_cast<float>(sampleRate_)) : 1.0f;
 }
@@ -38,7 +38,7 @@ void FMOperator::noteOn(float baseFrequency, float velocity, SampleRate sampleRa
     envStage_ = EnvStage::Attack;
     stageProgress_ = 0.0f;
     envelopeLevel_ = 0.0f;
-    phase_ = 0.0f;
+    phase_ = 0.25f;
     feedbackSample_ = 0.0f;
 }
 
@@ -114,8 +114,8 @@ void FMOperator::processEnvelope() noexcept {
             break;
             
         case EnvStage::Release:
-            envelopeLevel_ -= envelopeLevel_ * releaseRate_;
-            if (envelopeLevel_ <= 0.001f) {
+            envelopeLevel_ -= releaseRate_;
+            if (envelopeLevel_ <= 0.0f) {
                 envelopeLevel_ = 0.0f;
                 envStage_ = EnvStage::Idle;
             }
